@@ -46,6 +46,7 @@ var Engine = (function(global) {
          * our update function since it may be used for smooth animation.
          */
         update(dt);
+        reset();
         render();
 
         /* Set our lastTime variable which is used to determine the time delta
@@ -95,7 +96,6 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
-        player.update(dt);
     }
 
     /* This function initially draws the "game level", it will then call
@@ -138,6 +138,7 @@ var Engine = (function(global) {
         }
 
         renderEntities();
+        renderScore();
     }
 
     /* This function is called by the render function and is called on each game
@@ -155,12 +156,18 @@ var Engine = (function(global) {
         player.render();
     }
 
+    function renderScore() {
+        ctx.font = "30px arial";
+        ctx.fillText("Player score: " + score, 5, 30);
+    }
+
     /* This function does nothing but it could have been a good place to
      * handle game reset states - maybe a new game menu or a game over screen
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
+        console.log(canvas.width);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
     /* Go ahead and load all of the images we know we're going to need to

@@ -1,12 +1,15 @@
+"use strict";
+
 var canvas = document.getElementsByTagName('canvas')[0];
 var numEnemies = 3;
+var score = 0;
 
 var OffSet = function (left, right, top, bottom) {
     this.right = right;
     this.left = left;
     this.top = top;
     this.bottom = bottom;
-}
+};
 
 var Creature = function(x, y, offSetObj) {
     if (offSetObj instanceof OffSet) {
@@ -14,35 +17,24 @@ var Creature = function(x, y, offSetObj) {
     }
     this.x = x;
     this.y = y;
-}
+};
 
 Creature.prototype.getRight = function() {
     return this.x + this.offSet.right;
-}
+};
 
 Creature.prototype.getLeft = function() {
     return this.x + this.offSet.left;
-}
+};
 
 Creature.prototype.getTop = function() {
     return this.y + this.offSet.top;
-}
+};
 
 Creature.prototype.getBottom = function() {
     return this.y + this.offSet.bottom;
-}
+};
 
-Creature.prototype.moveCheck = function(x,y) {
-    var bottom = this.getBottom();
-    var top = this.getTop();
-    var left = this.getLeft();
-    var right = this.getRight();
-
-    return (right + x < canvas.width)
-    && (left + x > 0) 
-    && (bottom + y < canvas.height) 
-    && (top + y > 60);
-}
 // Enemies our player must avoid
 var Enemy = function(x, y, offSetObj) {
     // Variables applied to each of our instances go here,
@@ -62,16 +54,23 @@ var Enemy = function(x, y, offSetObj) {
 Enemy.prototype = Object.create(Creature.prototype);
 Enemy.constructor = Enemy.prototype;
 
+Enemy.prototype.moveCheck = function(x,y) {
+        var left = this.getLeft();
+
+        return left + x < canvas.width;
+};
+
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
+
 Enemy.prototype.update = function(dt) {
     if (this.moveCheck(1, 1)) {
         this.x = this.x + dt*50;
-        this.y = this.y + dt*5;
     }
     else {
-        this.x = Math.abs((Math.floor(Math.random()*canvas.width))-this.offSet.right);
-        this.y = Math.abs(40 + Math.floor(Math.random()*canvas.width-40)-this.offSet.bottom);
+        this.x = -(this.offSet.right);
+        this.y = 55 + 85*(Math.floor(Math.random()*4));
+        //this.y = Math.abs(40 + Math.floor(Math.random()*canvas.width-40)-this.offSet.bottom);
     }
     if (this.collisionCheck(player)) {
         player.collision();
@@ -101,11 +100,12 @@ Enemy.prototype.collisionCheck = function(target) {
     }
 
     if (collisionX() && collisionY()) {
+        score--;
         return true;
     } else {
         return false;
     }
-}
+};
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
@@ -126,10 +126,23 @@ var Player = function(x, y, offSetObj) {
 Player.prototype = Object.create(Creature.prototype);
 Player.constructor = Player.prototype;
 
-Player.prototype.update = function(dt) {
+Player.prototype.moveCheck = function(x,y) {
+    var bottom = this.getBottom();
+    var top = this.getTop();
+    var left = this.getLeft();
+    var right = this.getRight();
 
+    if (top + y <= 60) {
+        score++;
+        player.x = startingX;
+        player.y = startingY;
+    } else return (
+        (right + x < canvas.width)
+        && (left + x > 0) 
+        && (bottom + y < canvas.height) 
+        && (top + y > 60)
+        );
 };
-
 
 Player.prototype.handleInput = function(dir) {
         if (dir === "left") {
@@ -149,7 +162,7 @@ Player.prototype.handleInput = function(dir) {
             this.y = this.y + this.Ystep;
         }
         }
-    }
+    };
 
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
@@ -163,22 +176,20 @@ Player.prototype.collision = function () {
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
-var allEnemies = new Array();
+var allEnemies = [];
 
 var worldUpdate = function(dt) {
 if (dt % 3 === 0) {
-    for (i = 0; i < numEnemies; i++) {
+    for (var i = 0; i < numEnemies; i++) {
         var x = Math.floor(Math.random()*canvas.width);
-        var y = 40 + Math.floor(Math.random()*canvas.width-40);
+        var y = 55 + 85*(Math.floor(Math.random()*4));
         allEnemies.push(new Enemy(x, y, new OffSet(0, 100, 78, 144)));
         }
     }
-}
+};
 // Place the player object in a variable called player
 var startingX = 0;
 var startingY = canvas.height - 200;
-console.log(startingY);
-
 var player = new Player(startingX, startingY, new OffSet(17, 84, 64, 140));
 
 
