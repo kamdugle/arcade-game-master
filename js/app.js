@@ -1,14 +1,18 @@
 "use strict";
 
+//Set up globals
 var canvas = document.getElementsByTagName('canvas')[0];
 var numEnemies = 5;
 var score = 0;
-var enemySpeed = 70;
-var allEnmies = [];
+var enemySpeed = 90;
+var allEnemies = [];
+
+//introduce sprite logic
 var sprites = ['images/char-boy.png', 'images/char-cat-girl.png', 'images/char-horn-girl.png', 'images/char-pink-girl.png', 'images/char-princess-girl.png'];
 var spriteNum = Math.floor(Math.random()*sprites.length);
 Resources.load(sprites);
 
+//this is an object that records the offset of an images boundaries from its top-left corner
 var OffSet = function (left, right, top, bottom) {
     this.right = right;
     this.left = left;
@@ -16,6 +20,7 @@ var OffSet = function (left, right, top, bottom) {
     this.bottom = bottom;
 };
 
+//Intoduces the Creature superclass
 var Creature = function(x, y, offSetObj) {
     if (offSetObj instanceof OffSet) {
         this.offSet = offSetObj;
@@ -40,35 +45,26 @@ Creature.prototype.getBottom = function() {
     return this.y + this.offSet.bottom;
 };
 
-// Enemies our player must avoid
+// Enemies our player must avoid, created as a subclass of Creature 
 var Enemy = function(x, y, offSetObj, speed) {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
-
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
     Creature.call(this, x, y, offSetObj);
     this.sprite = 'images/enemy-bug.png';
     this.speed = speed;
-
-//    this.height = 171;
-//    this.width  = 101;
-//    this.x = x;
-//    this.y = y;
 };
 
 Enemy.prototype = Object.create(Creature.prototype);
 Enemy.constructor = Enemy.prototype;
 
+//Checks to see if enemy will go off canvas, returns false if so
 Enemy.prototype.moveCheck = function(x,y) {
         var left = this.getLeft();
 
         return left + x < canvas.width;
 };
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
-
+//moves the enemy forward after calling moveCheck to make sure further movement is possible.
+//Sends enemy to left side of canvas if it falls off the map, also calls a check for collisions with
+//the player and with other enemies and handles if so.
 Enemy.prototype.update = function(dt) {
     if (this.moveCheck(1, 1)) {
         this.x = this.x + dt*this.speed;
@@ -76,27 +72,21 @@ Enemy.prototype.update = function(dt) {
     else {
         this.x = -(this.offSet.right);
         this.y = 55 + 85*(Math.floor(Math.random()*4));
-        //this.y = Math.abs(40 + Math.floor(Math.random()*canvas.width-40)-this.offSet.bottom);
     }
     if (this.collisionCheck(player)) {
         player.collision();
     }
 
-    var numEnemies = allEnemies.length;
-
     for (var i = 0; i < numEnemies; i++) {
         if (this !== allEnemies[i]) {
             if (this.collisionCheck(allEnemies[i])) {
-                //this.x = Math.floor(Math.random()*canvas.width);
                 this.y = 55 + 85*(Math.floor(Math.random()*4));
             }
         }
     } 
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
 };
 
+//Checks for the collision of enemy against a given target.
 Enemy.prototype.collisionCheck = function(target) {
     var enemyLeft = this.getLeft();
     var enemyRight = this.getRight();
@@ -123,18 +113,14 @@ Enemy.prototype.collisionCheck = function(target) {
     }
 };
 
-// Draw the enemy on the screen, required method for game
+// Draw the enemy on the screens
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
-
+//Creates a player, a subclass of Creature
 var Player = function(x, y, offSetObj) {
     Creature.call(this, x, y, offSetObj);
-    console.log(sprites[spriteNum]);
     this.sprite = sprites[spriteNum];
     this.Xstep = 101;
     this.Ystep = 171/2;
@@ -143,6 +129,7 @@ var Player = function(x, y, offSetObj) {
 Player.prototype = Object.create(Creature.prototype);
 Player.constructor = Player.prototype;
 
+//Checks for legal moves, returns true if so
 Player.prototype.moveCheck = function(x,y) {
     var bottom = this.getBottom();
     var top = this.getTop();
@@ -161,6 +148,7 @@ Player.prototype.moveCheck = function(x,y) {
         );
 };
 
+//handles keyboard input, confirming legal moves with moveCheck before allowing. Also handles sprite changing.
 Player.prototype.handleInput = function(dir) {
         if (dir === "change") {
             spriteNum = (spriteNum + 1) % sprites.length;
@@ -186,10 +174,12 @@ Player.prototype.handleInput = function(dir) {
         }
     };
 
+//renders the player sprite.
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+//resets the game board when an enemy collides with player
 Player.prototype.collision = function () {
     score = 0;
     allEnemies = [];
@@ -198,8 +188,6 @@ Player.prototype.collision = function () {
     this.y = startingY;
 };
 
-
-// Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 var allEnemies = [];
 
@@ -211,12 +199,9 @@ function initiateEnemies() {
         }
 }
 
-var worldUpdate = function(dt) {
-if (dt % 3 === 0) {
-    initiateEnemies();
-    }
-};
-// Place the player object in a variable called player
+initiateEnemies();
+
+// Places the player object in a variable called player
 var startingX = 0;
 var startingY = canvas.height - 200;
 var player = new Player(startingX, startingY, new OffSet(23, 89, 69, 145));

@@ -92,7 +92,6 @@ var Engine = (function(global) {
      * render methods.
      */
     function updateEntities(dt) {
-        worldUpdate(dt);
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
@@ -166,7 +165,6 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        console.log(canvas.width);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 

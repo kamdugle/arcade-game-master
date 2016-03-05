@@ -1,7 +1,10 @@
 frontend-nanodegree-arcade-game
 ===============================
 
-Students should use this [rubric](https://www.udacity.com/course/viewer/#!/c-nd001/l-2696458597/m-2687128535) for self-checking their submission.
+This game is straightforward. Control your player by clicking up, down, left, and right arrows.
 
-For detailed instructions on how to get started, check out this [guide](https://docs.google.com/document/d/1v01aScPjSWCCWQLIpFqvg3-vXLH2e8_SZQKC8jNO0Dc/pub?embedded=true).
-# arcade-game-master
+By arriving to the river, a point is scored, and player is put back at start.
+
+If player is struck by an enemy insect, the game starts over.
+
+Clicking 'c' allows player to change their character.
