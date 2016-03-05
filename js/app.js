@@ -4,6 +4,10 @@ var canvas = document.getElementsByTagName('canvas')[0];
 var numEnemies = 5;
 var score = 0;
 var enemySpeed = 70;
+var allEnmies = [];
+var sprites = ['images/char-boy.png', 'images/char-cat-girl.png', 'images/char-horn-girl.png', 'images/char-pink-girl.png', 'images/char-princess-girl.png'];
+var spriteNum = Math.floor(Math.random()*sprites.length);
+Resources.load(sprites);
 
 var OffSet = function (left, right, top, bottom) {
     this.right = right;
@@ -113,7 +117,6 @@ Enemy.prototype.collisionCheck = function(target) {
     }
 
     if (collisionX() && collisionY()) {
-        score--;
         return true;
     } else {
         return false;
@@ -131,7 +134,8 @@ Enemy.prototype.render = function() {
 
 var Player = function(x, y, offSetObj) {
     Creature.call(this, x, y, offSetObj);
-    this.sprite = 'images/char-boy.png';
+    console.log(sprites[spriteNum]);
+    this.sprite = sprites[spriteNum];
     this.Xstep = 101;
     this.Ystep = 171/2;
 };
@@ -158,7 +162,12 @@ Player.prototype.moveCheck = function(x,y) {
 };
 
 Player.prototype.handleInput = function(dir) {
-        if (dir === "left") {
+        if (dir === "change") {
+            spriteNum = (spriteNum + 1) % sprites.length;
+            this.sprite = sprites[spriteNum];
+
+        }
+        else if (dir === "left") {
             if (this.moveCheck(-(this.Xstep), 0)) {
                 this.x = this.x - this.Xstep;
             }
@@ -182,6 +191,9 @@ Player.prototype.render = function() {
 };
 
 Player.prototype.collision = function () {
+    score = 0;
+    allEnemies = [];
+    initiateEnemies();
     this.x = startingX;
     this.y = startingY;
 };
@@ -191,20 +203,23 @@ Player.prototype.collision = function () {
 // Place all enemy objects in an array called allEnemies
 var allEnemies = [];
 
-var worldUpdate = function(dt) {
-if (dt % 3 === 0) {
-    for (var i = 0; i < numEnemies; i++) {
+function initiateEnemies() {
+    while (allEnemies.length < numEnemies) {
         var x = Math.floor(Math.random()*canvas.width);
         var y = 55 + 85*(Math.floor(Math.random()*4));
-
         allEnemies.push(new Enemy(x, y, new OffSet(0, 100, 78, 144), enemySpeed));
         }
+}
+
+var worldUpdate = function(dt) {
+if (dt % 3 === 0) {
+    initiateEnemies();
     }
 };
 // Place the player object in a variable called player
 var startingX = 0;
 var startingY = canvas.height - 200;
-var player = new Player(startingX, startingY, new OffSet(17, 84, 64, 140));
+var player = new Player(startingX, startingY, new OffSet(23, 89, 69, 145));
 
 
 // This listens for key presses and sends the keys to your
@@ -214,7 +229,8 @@ document.addEventListener('keydown', function(e) {
         37: 'left',
         38: 'up',
         39: 'right',
-        40: 'down'
+        40: 'down',
+        67: 'change'
     };
     player.handleInput(allowedKeys[e.keyCode]);
 });
