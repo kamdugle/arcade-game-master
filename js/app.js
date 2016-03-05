@@ -1,8 +1,9 @@
 "use strict";
 
 var canvas = document.getElementsByTagName('canvas')[0];
-var numEnemies = 3;
+var numEnemies = 5;
 var score = 0;
+var enemySpeed = 70;
 
 var OffSet = function (left, right, top, bottom) {
     this.right = right;
@@ -36,7 +37,7 @@ Creature.prototype.getBottom = function() {
 };
 
 // Enemies our player must avoid
-var Enemy = function(x, y, offSetObj) {
+var Enemy = function(x, y, offSetObj, speed) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
@@ -44,6 +45,7 @@ var Enemy = function(x, y, offSetObj) {
     // a helper we've provided to easily load images
     Creature.call(this, x, y, offSetObj);
     this.sprite = 'images/enemy-bug.png';
+    this.speed = speed;
 
 //    this.height = 171;
 //    this.width  = 101;
@@ -65,7 +67,7 @@ Enemy.prototype.moveCheck = function(x,y) {
 
 Enemy.prototype.update = function(dt) {
     if (this.moveCheck(1, 1)) {
-        this.x = this.x + dt*50;
+        this.x = this.x + dt*this.speed;
     }
     else {
         this.x = -(this.offSet.right);
@@ -75,6 +77,17 @@ Enemy.prototype.update = function(dt) {
     if (this.collisionCheck(player)) {
         player.collision();
     }
+
+    var numEnemies = allEnemies.length;
+
+    for (var i = 0; i < numEnemies; i++) {
+        if (this !== allEnemies[i]) {
+            if (this.collisionCheck(allEnemies[i])) {
+                //this.x = Math.floor(Math.random()*canvas.width);
+                this.y = 55 + 85*(Math.floor(Math.random()*4));
+            }
+        }
+    } 
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
@@ -183,7 +196,8 @@ if (dt % 3 === 0) {
     for (var i = 0; i < numEnemies; i++) {
         var x = Math.floor(Math.random()*canvas.width);
         var y = 55 + 85*(Math.floor(Math.random()*4));
-        allEnemies.push(new Enemy(x, y, new OffSet(0, 100, 78, 144)));
+
+        allEnemies.push(new Enemy(x, y, new OffSet(0, 100, 78, 144), enemySpeed));
         }
     }
 };
