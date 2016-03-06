@@ -1,5 +1,6 @@
 frontend-nanodegree-arcade-game
 ===============================
+To run, open "index.html" in your browser.
 
 This game is straightforward. Control your player by clicking up, down, left, and right arrows.
 

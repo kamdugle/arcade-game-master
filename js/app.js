@@ -2,9 +2,9 @@
 
 //Set up globals
 var canvas = document.getElementsByTagName('canvas')[0];
-var numEnemies = 5;
+var NUM_ENEMIES = 5;
+var ENEMY_SPEED = 90;
 var score = 0;
-var enemySpeed = 90;
 var allEnemies = [];
 
 //introduce sprite logic
@@ -77,7 +77,7 @@ Enemy.prototype.update = function(dt) {
         player.collision();
     }
 
-    for (var i = 0; i < numEnemies; i++) {
+    for (var i = 0; i < NUM_ENEMIES; i++) {
         if (this !== allEnemies[i]) {
             if (this.collisionCheck(allEnemies[i])) {
                 this.y = 55 + 85*(Math.floor(Math.random()*4));
@@ -122,8 +122,8 @@ Enemy.prototype.render = function() {
 var Player = function(x, y, offSetObj) {
     Creature.call(this, x, y, offSetObj);
     this.sprite = sprites[spriteNum];
-    this.Xstep = 101;
-    this.Ystep = 171/2;
+    this.X_STEP = 101;
+    this.Y_STEP = 171/2;
 };
 
 Player.prototype = Object.create(Creature.prototype);
@@ -138,13 +138,13 @@ Player.prototype.moveCheck = function(x,y) {
 
     if (top + y <= 60) {
         score++;
-        player.x = startingX;
-        player.y = startingY;
+        this.x = startingX;
+        this.y = startingY;
     } else return (
-        (right + x < canvas.width)
-        && (left + x > 0) 
-        && (bottom + y < canvas.height) 
-        && (top + y > 60)
+        (right + x < canvas.width) &&
+        (left + x > 0) &&
+        (bottom + y < canvas.height) &&
+        (top + y > 60)
         );
 };
 
@@ -156,20 +156,20 @@ Player.prototype.handleInput = function(dir) {
 
         }
         else if (dir === "left") {
-            if (this.moveCheck(-(this.Xstep), 0)) {
-                this.x = this.x - this.Xstep;
+            if (this.moveCheck(-(this.X_STEP), 0)) {
+                this.x = this.x - this.X_STEP;
             }
         } else if (dir === "right") {
-            if (this.moveCheck(this.Xstep, 0)) {
-                this.x = this.x + this.Xstep;
+            if (this.moveCheck(this.X_STEP, 0)) {
+                this.x = this.x + this.X_STEP;
             }
         } else if (dir === "up") {
-            if (this.moveCheck(0, -(this.Ystep))) {
-            this.y = this.y - this.Ystep;
+            if (this.moveCheck(0, -(this.Y_STEP))) {
+            this.y = this.y - this.Y_STEP;
         }
         } else {
-            if (this.moveCheck(0, this.Xstep)) {
-            this.y = this.y + this.Ystep;
+            if (this.moveCheck(0, this.X_STEP)) {
+            this.y = this.y + this.Y_STEP;
         }
         }
     };
@@ -192,10 +192,10 @@ Player.prototype.collision = function () {
 var allEnemies = [];
 
 function initiateEnemies() {
-    while (allEnemies.length < numEnemies) {
+    while (allEnemies.length < NUM_ENEMIES) {
         var x = Math.floor(Math.random()*canvas.width);
         var y = 55 + 85*(Math.floor(Math.random()*4));
-        allEnemies.push(new Enemy(x, y, new OffSet(0, 100, 78, 144), enemySpeed));
+        allEnemies.push(new Enemy(x, y, new OffSet(0, 100, 78, 144), ENEMY_SPEED));
         }
 }
 
